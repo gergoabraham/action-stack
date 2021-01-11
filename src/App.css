@@ -1,4 +1,5 @@
-.App {
+.App h1,
+.App h2 {
   text-align: center;
 }
 
@@ -10,4 +11,12 @@
 
 .button-container button {
   width: 5rem;
+}
+
+form {
+  margin: auto;
+  width: fit-content;
+  display: flex;
+  flex-direction: column;
+  justify-content: left;
 }

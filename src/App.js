@@ -3,7 +3,8 @@ import _ from 'lodash';
 
 import './App.css';
 import { useActionStack } from './ActionStack/ActionStack';
-import ActionButton from './ActionButton/ActionButton';
+import ActionButton from './components/ActionButton';
+import Input from './components/Input';
 
 function App() {
   const {
@@ -17,6 +18,8 @@ function App() {
     dev: true,
     qa: true,
     prod: false,
+    text: 'This is a text.',
+    number: 13,
   });
 
   const [draftState, setDraftState] = useState(null);
@@ -32,30 +35,14 @@ function App() {
       <h2>useActionStack hook</h2>
       <form id="form">
         {draftState &&
-          Object.keys(draftState).map((attribute) => (
-            <React.Fragment key={attribute}>
-              <input
-                type="checkbox"
-                id={attribute}
-                checked={draftState[attribute]}
-                onChange={(event) =>
-                  setDraftState((prev) => {
-                    return { ...prev, [attribute]: event.target['checked'] };
-                  })
-                }
-              />
-              <label
-                htmlFor={attribute}
-                style={{
-                  fontWeight:
-                    draftState[attribute] !== state[attribute]
-                      ? 'bold'
-                      : 'normal',
-                }}
-              >
-                {attribute}
-              </label>
-            </React.Fragment>
+          Object.keys(draftState).map((key) => (
+            <Input
+              key={key}
+              name={key}
+              value={draftState[key]}
+              onChange={setDraftState}
+              referenceValue={state[key]}
+            />
           ))}
 
         <div className="button-container">
