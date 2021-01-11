@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import './App.css';
 import { useActionStack } from './ActionStack/ActionStack';
+import ActionButton from './ActionButton/ActionButton';
 
 function App() {
   const {
@@ -9,8 +10,8 @@ function App() {
     onAction,
     onUndo,
     onRedo,
-    isUndoAvailable,
-    isRedoAvailable,
+    numberOfAvailableUndo,
+    numberOfAvailableRedo,
   } = useActionStack({
     dev: true,
     qa: true,
@@ -29,14 +30,6 @@ function App() {
 
       <h2>useActionStack hook</h2>
       <form id="form">
-        <button type="button" onClick={onUndo} disabled={!isUndoAvailable}>
-          Undo
-        </button>
-
-        <button type="button" onClick={onRedo} disabled={!isRedoAvailable}>
-          Redo
-        </button>
-
         {draftState &&
           Object.keys(draftState).map((attribute) => (
             <React.Fragment key={attribute}>
@@ -64,9 +57,29 @@ function App() {
             </React.Fragment>
           ))}
 
-        <button type="button" form="form" onClick={() => onAction(draftState)}>
-          Save
-        </button>
+        <div className="button-container">
+          <ActionButton
+            numberOfAvailableOperations={numberOfAvailableUndo}
+            onClick={onUndo}
+          >
+            Undo
+          </ActionButton>
+
+          <ActionButton
+            numberOfAvailableOperations={numberOfAvailableRedo}
+            onClick={onRedo}
+          >
+            Redo
+          </ActionButton>
+
+          <button
+            type="button"
+            form="form"
+            onClick={() => onAction(draftState)}
+          >
+            Save
+          </button>
+        </div>
       </form>
     </div>
   );

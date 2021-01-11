@@ -1,0 +1,14 @@
+.action-button {
+  position: relative;
+}
+
+.action-button .additional-buttons {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  z-index: 10;
+}
+
+.action-button button {
+  min-width: 5rem;
+}
