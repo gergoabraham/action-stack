@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { useState } from 'react';
 
 export function useActionStack(initialState) {
@@ -7,10 +8,19 @@ export function useActionStack(initialState) {
   });
 
   const onAction = (newState) => {
-    setState((state) => ({
-      history: [...state.history.slice(0, state.historyIndex + 1), newState],
-      historyIndex: state.historyIndex + 1,
-    }));
+    setState((state) => {
+      if (!_.isEqual(state.history[state.historyIndex], newState)) {
+        return {
+          history: [
+            ...state.history.slice(0, state.historyIndex + 1),
+            newState,
+          ],
+          historyIndex: state.historyIndex + 1,
+        };
+      } else {
+        return state;
+      }
+    });
   };
 
   const onUndo = (steps = 1) => {

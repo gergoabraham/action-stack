@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import _ from 'lodash';
 
 import './App.css';
 import { useActionStack } from './ActionStack/ActionStack';
@@ -76,6 +77,7 @@ function App() {
             type="button"
             form="form"
             onClick={() => onAction(draftState)}
+            disabled={_.isEqual(draftState, state)}
           >
             Save
           </button>
