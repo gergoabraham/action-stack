@@ -2,59 +2,117 @@ import _ from 'lodash';
 import { useState } from 'react';
 
 export function useActionStack(initialState) {
-  const [state, setState] = useState({
-    history: [initialState],
+  const [history, setHistory] = useState({
+    array: [initialState],
     historyIndex: 0,
   });
 
   const onAction = (newState) => {
-    setState((state) => {
-      if (!_.isEqual(state.history[state.historyIndex], newState)) {
+    setHistory((history) => {
+      const previousState = history.array[history.historyIndex];
+      const diffForUndo = getDifferences(previousState, newState);
+
+      if (Object.keys(diffForUndo).length > 0) {
         return {
-          history: [
-            ...state.history.slice(0, state.historyIndex + 1),
+          array: [
+            ...history.array.slice(0, history.historyIndex),
+            diffForUndo,
             newState,
           ],
-          historyIndex: state.historyIndex + 1,
+          historyIndex: history.historyIndex + 1,
         };
       } else {
-        return state;
+        return history;
       }
     });
   };
 
   const onUndo = (steps = 1) => {
-    if (steps <= state.historyIndex) {
-      setState((state) => ({
-        history: state.history,
-        historyIndex: state.historyIndex - steps,
-      }));
+    if (steps <= history.historyIndex) {
+      setHistory((history) => {
+        let historyDraft = { ...history };
+
+        for (let i = 0; i < steps; i++) {
+          const currentState = historyDraft.array[historyDraft.historyIndex];
+          const previousState = {
+            ...currentState,
+            ...historyDraft.array[historyDraft.historyIndex - 1],
+          };
+          const diffForRedo = getDifferences(currentState, previousState);
+
+          historyDraft = {
+            array: [
+              ...historyDraft.array.slice(0, historyDraft.historyIndex - 1),
+              previousState,
+              diffForRedo,
+              ...historyDraft.array.slice(historyDraft.historyIndex + 1),
+            ],
+            historyIndex: historyDraft.historyIndex - 1,
+          };
+        }
+
+        return historyDraft;
+      });
     }
   };
 
   const onRedo = (steps = 1) => {
-    if (steps <= state.history.length - 1 - state.historyIndex) {
-      setState((state) => ({
-        ...state,
-        historyIndex: state.historyIndex + steps,
-      }));
+    if (steps <= history.array.length - 1 - history.historyIndex) {
+      setHistory((history) => {
+        let historyDraft = { ...history };
+
+        for (let i = 0; i < steps; i++) {
+          const nextState = {
+            ...historyDraft.array[historyDraft.historyIndex],
+            ...historyDraft.array[historyDraft.historyIndex + 1],
+          };
+          const diffForUndo = getDifferences(
+            historyDraft.array[historyDraft.historyIndex],
+            nextState
+          );
+
+          historyDraft = {
+            array: [
+              ...historyDraft.array.slice(0, historyDraft.historyIndex),
+              diffForUndo,
+              nextState,
+              ...historyDraft.array.slice(historyDraft.historyIndex + 2),
+            ],
+            historyIndex: historyDraft.historyIndex + 1,
+          };
+        }
+        return historyDraft;
+      });
     }
   };
 
-  const numberOfAvailableUndo = state.historyIndex;
-  const numberOfAvailableRedo = Math.max(
-    state.history.length - 1 - state.historyIndex,
+  const numberOfAvailableUndos = history.historyIndex;
+  const numberOfAvailableRedos = Math.max(
+    history.array.length - 1 - history.historyIndex,
     0
   );
 
   return {
-    state: state.history[state.historyIndex],
+    state: history.array[history.historyIndex],
     onAction,
     onUndo,
     onRedo,
-    isUndoAvailable: numberOfAvailableUndo > 0,
-    isRedoAvailable: numberOfAvailableRedo > 0,
-    numberOfAvailableUndo,
-    numberOfAvailableRedo,
+    isUndoAvailable: numberOfAvailableUndos > 0,
+    isRedoAvailable: numberOfAvailableRedos > 0,
+    numberOfAvailableUndos,
+    numberOfAvailableRedos,
   };
+
+  function getDifferences(object, referenceObject) {
+    const differences = {};
+
+    for (const key in referenceObject) {
+      if (Object.hasOwnProperty.call(referenceObject, key)) {
+        if (referenceObject[key] !== object[key]) {
+          differences[key] = object[key];
+        }
+      }
+    }
+    return differences;
+  }
 }

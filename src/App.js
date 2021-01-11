@@ -12,8 +12,8 @@ function App() {
     onAction,
     onUndo,
     onRedo,
-    numberOfAvailableUndo,
-    numberOfAvailableRedo,
+    numberOfAvailableUndos,
+    numberOfAvailableRedos,
   } = useActionStack({
     dev: true,
     qa: true,
@@ -47,14 +47,14 @@ function App() {
 
         <div className="button-container">
           <ActionButton
-            numberOfAvailableOperations={numberOfAvailableUndo}
+            numberOfAvailableOperations={numberOfAvailableUndos}
             onClick={onUndo}
           >
             Undo
           </ActionButton>
 
           <ActionButton
-            numberOfAvailableOperations={numberOfAvailableRedo}
+            numberOfAvailableOperations={numberOfAvailableRedos}
             onClick={onRedo}
           >
             Redo
