@@ -4,7 +4,14 @@ import './App.css';
 import { useActionStack } from './ActionStack/ActionStack';
 
 function App() {
-  const { state, onAction, onUndo, isUndoAvailable } = useActionStack({
+  const {
+    state,
+    onAction,
+    onUndo,
+    onRedo,
+    isUndoAvailable,
+    isRedoAvailable,
+  } = useActionStack({
     dev: true,
     qa: true,
     prod: false,
@@ -24,6 +31,10 @@ function App() {
       <form id="form">
         <button type="button" onClick={onUndo} disabled={!isUndoAvailable}>
           Undo
+        </button>
+
+        <button type="button" onClick={onRedo} disabled={!isRedoAvailable}>
+          Redo
         </button>
 
         {draftState &&

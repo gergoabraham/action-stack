@@ -2,32 +2,41 @@ import { useState } from 'react';
 
 export function useActionStack(initialState) {
   const [state, setState] = useState({
-    currentState: initialState,
-    history: [],
+    history: [initialState],
+    historyIndex: 0,
   });
 
   const onAction = (newState) => {
     setState((state) => ({
-      ...state,
-      history: [...state.history, state.currentState],
-      currentState: newState,
+      history: [...state.history.slice(0, state.historyIndex + 1), newState],
+      historyIndex: state.historyIndex + 1,
     }));
   };
 
   const onUndo = () => {
-    if (state.history.length) {
+    if (state.historyIndex > 0) {
+      setState((state) => ({
+        history: state.history,
+        historyIndex: state.historyIndex - 1,
+      }));
+    }
+  };
+
+  const onRedo = () => {
+    if (state.historyIndex < state.history.length - 1) {
       setState((state) => ({
         ...state,
-        history: state.history.slice(0, -1),
-        currentState: state.history[state.history.length - 1],
+        historyIndex: state.historyIndex + 1,
       }));
     }
   };
 
   return {
-    state: state.currentState,
+    state: state.history[state.historyIndex],
     onAction,
     onUndo,
-    isUndoAvailable: !!state.history.length,
+    onRedo,
+    isUndoAvailable: state.historyIndex > 0,
+    isRedoAvailable: state.historyIndex < state.history.length - 1,
   };
 }
