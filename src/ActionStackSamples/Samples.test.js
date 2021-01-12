@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import App from './App';
+import HookSample from './HookSample';
 
 describe('E2E tests', () => {
   const initialState = {
@@ -11,7 +11,7 @@ describe('E2E tests', () => {
   let checkboxElem, textInput, numberInput, saveButton, undoButton, redoButton;
 
   beforeEach(() => {
-    render(<App initialState={initialState} />);
+    render(<HookSample initialState={initialState} />);
 
     checkboxElem = screen.getByLabelText('a:');
     textInput = screen.getByLabelText('b:');
