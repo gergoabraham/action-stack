@@ -7,7 +7,7 @@ class HOCSample extends React.Component {
   render() {
     return (
       <div>
-        <h2>useActionStack HOC example</h2>
+        <h2>ActionStack HOC example</h2>
 
         <UndoableForm {...this.props} />
       </div>

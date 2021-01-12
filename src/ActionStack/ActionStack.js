@@ -1,5 +1,5 @@
 import _ from 'lodash/array';
-import { useState } from 'react';
+import { useState, createContext, useContext } from 'react';
 
 // Hook
 export function useActionStack(initialState) {
@@ -26,6 +26,23 @@ export const withActionStack = (WrappedComponent) => ({
 
   return <WrappedComponent {...props} {...actionStackHookProps} />;
 };
+
+// Provider
+export const ActionStackContext = createContext(null);
+
+export function useActionStackContext() {
+  return useContext(ActionStackContext);
+}
+
+export function ActionStackProvider({ initialState, children }) {
+  const props = useActionStack(initialState);
+
+  return (
+    <ActionStackContext.Provider value={props}>
+      {children}
+    </ActionStackContext.Provider>
+  );
+}
 
 // Business logic, exported for tests
 export class Logic {

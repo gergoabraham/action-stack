@@ -1,12 +1,16 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import HookSample from './HookSample';
 import HOCSample from './HOCSample';
+import ProviderSample from './ProviderSample';
 
 // eslint-disable-next-line jest/valid-describe
 describe('E2E tests for Hook', e2eTestFor(HookSample));
 
 // eslint-disable-next-line jest/valid-describe
 describe('E2E tests for HOC', e2eTestFor(HOCSample));
+
+// eslint-disable-next-line jest/valid-describe
+describe('E2E tests for Provider', e2eTestFor(ProviderSample));
 
 function e2eTestFor(SampleUnderTest) {
   return () => {

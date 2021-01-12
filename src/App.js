@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import './App.css';
 import HookSample from './ActionStackSamples/HookSample';
 import HOCSample from './ActionStackSamples/HOCSample';
+import ProviderSample from './ActionStackSamples/ProviderSample';
 
 const initialState = {
   dev: true,
@@ -19,7 +20,7 @@ function App() {
     <div className="App">
       <h1>ActionStack</h1>
 
-      <form class="sample-selector">
+      <form className="sample-selector">
         <button type="button" onClick={() => setSample('hook')}>
           Hook
         </button>
@@ -33,6 +34,7 @@ function App() {
 
       {sample === 'hook' && <HookSample initialState={initialState} />}
       {sample === 'hoc' && <HOCSample initialState={initialState} />}
+      {sample === 'provider' && <ProviderSample initialState={initialState} />}
     </div>
   );
 }
