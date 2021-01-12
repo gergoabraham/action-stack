@@ -78,7 +78,20 @@ describe('ActionStackLogic unit tests', () => {
         expect(history).toStrictEqual(initialHistory);
       });
 
-      // not handled: if the new state has different keys as the previous one
+      test('throw error when new state has different keys', () => {
+        const expectedErrorMessage =
+          'ActionStack.onAction received a new state that has different keys than the previous one.';
+
+        expect(() =>
+          Logic.onAction({ a: 'blab', b: 13 })(initialHistory)
+        ).toThrowError(expectedErrorMessage);
+
+        expect(() =>
+          Logic.onAction({ a: 'blab', b: 13, c: true, d: false })(
+            initialHistory
+          )
+        ).toThrowError(expectedErrorMessage);
+      });
     });
 
     describe('onUndo/onRedo', () => {
@@ -122,6 +135,14 @@ describe('ActionStackLogic unit tests', () => {
           const sameHistory = Logic.onUndo(5)(historyWith4Undos);
           expect(sameHistory).toStrictEqual(historyWith4Undos);
         });
+
+        test('does nothing when undo step is too small', () => {
+          let sameHistory = Logic.onUndo(0)(historyWith4Undos);
+          expect(sameHistory).toStrictEqual(historyWith4Undos);
+
+          sameHistory = Logic.onUndo(-1)(historyWith4Undos);
+          expect(sameHistory).toStrictEqual(historyWith4Undos);
+        });
       });
 
       describe('onRedo', () => {
@@ -162,6 +183,14 @@ describe('ActionStackLogic unit tests', () => {
 
         test('does nothing when undo step is too large', () => {
           const sameHistory = Logic.onUndo(5)(historyWith4Redos);
+          expect(sameHistory).toStrictEqual(historyWith4Redos);
+        });
+
+        test('does nothing when redo step is too small', () => {
+          let sameHistory = Logic.onRedo(0)(historyWith4Redos);
+          expect(sameHistory).toStrictEqual(historyWith4Redos);
+
+          sameHistory = Logic.onRedo(-1)(historyWith4Redos);
           expect(sameHistory).toStrictEqual(historyWith4Redos);
         });
       });

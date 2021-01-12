@@ -1,3 +1,4 @@
+import _ from 'lodash/array';
 import { useState } from 'react';
 
 export function useActionStack(initialState) {
@@ -30,6 +31,9 @@ export class Logic {
 
   static onAction = (newState) => (history) => {
     const previousState = history.array[history.historyIndex];
+
+    Logic.assertNewState(newState, previousState);
+
     const diffForUndo = Logic.getDifferences(previousState, newState);
 
     if (Object.keys(diffForUndo).length > 0) {
@@ -116,5 +120,19 @@ export class Logic {
       }
     }
     return differences;
+  };
+
+  static assertNewState = (newState, previousState) => {
+    const newKeys = Object.keys(newState);
+    const previousKeys = Object.keys(previousState);
+
+    if (
+      _.difference(newKeys, previousKeys).length ||
+      _.difference(previousKeys, newKeys).length
+    ) {
+      throw new Error(
+        'ActionStack.onAction received a new state that has different keys than the previous one.'
+      );
+    }
   };
 }
