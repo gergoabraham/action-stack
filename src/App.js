@@ -6,7 +6,7 @@ import { useActionStack } from './ActionStack/ActionStack';
 import ActionButton from './components/ActionButton';
 import Input from './components/Input';
 
-function App() {
+function App({ initialState }) {
   const {
     state,
     onAction,
@@ -14,13 +14,7 @@ function App() {
     onRedo,
     numberOfAvailableUndos,
     numberOfAvailableRedos,
-  } = useActionStack({
-    dev: true,
-    qa: true,
-    prod: false,
-    text: 'This is a text.',
-    number: 13,
-  });
+  } = useActionStack(initialState);
 
   const [draftState, setDraftState] = useState(null);
 
@@ -33,7 +27,7 @@ function App() {
       <h1>ActionStack</h1>
 
       <h2>useActionStack hook</h2>
-      <form id="form">
+      <form>
         {draftState &&
           Object.keys(draftState).map((key) => (
             <Input
@@ -64,7 +58,6 @@ function App() {
 
           <button
             type="button"
-            form="form"
             onClick={() => onAction(draftState)}
             disabled={_.isEqual(draftState, state)}
           >
