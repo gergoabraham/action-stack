@@ -28,7 +28,7 @@ function Input({ name, value, referenceValue, onChange }) {
   }
 
   return (
-    <div key={name}>
+    <div>
       <label
         htmlFor={name}
         style={{
@@ -41,11 +41,7 @@ function Input({ name, value, referenceValue, onChange }) {
       <input
         {...typeProps}
         id={name}
-        onChange={(event) =>
-          onChange((prev) => {
-            return { ...prev, [name]: valueSelector(event) };
-          })
-        }
+        onChange={(event) => onChange(valueSelector(event))}
       />
     </div>
   );

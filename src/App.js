@@ -40,7 +40,9 @@ function App() {
               key={key}
               name={key}
               value={draftState[key]}
-              onChange={setDraftState}
+              onChange={(value) =>
+                setDraftState((prev) => ({ ...prev, [key]: value }))
+              }
               referenceValue={state[key]}
             />
           ))}
