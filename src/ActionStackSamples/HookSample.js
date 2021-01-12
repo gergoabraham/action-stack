@@ -4,22 +4,36 @@ import { useActionStack } from '../ActionStack/ActionStack';
 import StatelessForm from './StatelessForm';
 
 function HookSample({ initialState }) {
-  const props = useActionStack(initialState);
+  const {
+    state,
+    onAction,
+    onUndo,
+    onRedo,
+    numberOfAvailableUndos,
+    numberOfAvailableRedos,
+  } = useActionStack(initialState);
 
   const [draftState, setDraftState] = useState(null);
 
   useEffect(() => {
-    setDraftState(props.state);
-  }, [props.state]);
+    setDraftState(state);
+  }, [state]);
 
   return (
     <div>
-      <h2>useActionStack hook</h2>
+      <h2>useActionStack hook example</h2>
 
       <StatelessForm
-        {...props}
+        state={state}
+        onAction={onAction}
+        onUndo={onUndo}
+        onRedo={onRedo}
+        numberOfAvailableUndos={numberOfAvailableUndos}
+        numberOfAvailableRedos={numberOfAvailableRedos}
         draftState={draftState}
-        setDraftState={setDraftState}
+        onDraftChange={(change) =>
+          setDraftState((prev) => ({ ...prev, ...change }))
+        }
       />
     </div>
   );

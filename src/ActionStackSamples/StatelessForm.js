@@ -11,7 +11,7 @@ function StatelessForm({
   numberOfAvailableUndos,
   numberOfAvailableRedos,
   draftState,
-  setDraftState,
+  onDraftChange,
 }) {
   return (
     <form>
@@ -21,9 +21,7 @@ function StatelessForm({
             key={key}
             name={key}
             value={draftState[key]}
-            onChange={(value) =>
-              setDraftState((prev) => ({ ...prev, [key]: value }))
-            }
+            onChange={(value) => onDraftChange({ [key]: value })}
             referenceValue={state[key]}
           />
         ))}
