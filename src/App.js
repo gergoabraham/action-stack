@@ -20,7 +20,7 @@ function App() {
     <div className="App">
       <h1>ActionStack</h1>
 
-      <form className="sample-selector">
+      <form className="example-selector">
         <button type="button" onClick={() => setSample('hook')}>
           Hook
         </button>

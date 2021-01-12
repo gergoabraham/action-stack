@@ -1,5 +1,7 @@
 import React from 'react';
 
+import './Input.css';
+
 function Input({ formId, name, value, referenceValue, onChange }) {
   let typeProps, valueSelector;
 
@@ -28,15 +30,8 @@ function Input({ formId, name, value, referenceValue, onChange }) {
   }
 
   return (
-    <div>
-      <label
-        htmlFor={formId + name}
-        style={{
-          fontWeight: value !== referenceValue ? 'bold' : 'normal',
-        }}
-      >
-        {name}:
-      </label>
+    <div className={value !== referenceValue ? 'diff-highlight' : ''}>
+      <label htmlFor={formId + name}>{name}:</label>
 
       <input
         {...typeProps}

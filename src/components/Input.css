@@ -1,0 +1,4 @@
+.diff-highlight {
+  background-color: var(--color-button-bg);
+  color: var(--color-button-bg-disabled);
+}

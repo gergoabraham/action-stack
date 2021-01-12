@@ -1,11 +1,90 @@
+:root {
+  --color: #fb0c06;
+  --color-background: #e7edea;
+
+  --color-button: #000;
+  --color-button-bg: #ffc52c;
+  --color-button-bg-hover: #fb0c06;
+  --color-button-bg-disabled: #030d4f;
+}
+
+body {
+  background-color: var(--color-background);
+}
+
+.App {
+  font-family: 'Roboto', sans-serif;
+  padding: 1rem;
+
+  color: var(--color);
+}
+
 .App h1,
 .App h2,
 .App h3 {
   text-align: center;
+  font-family: 'Montserrat', sans-serif;
+
+  position: relative;
+  width: fit-content;
+  padding: 1rem;
+  margin: 1rem auto;
 }
 
-.sample-selector {
+.App h1 {
+  position: relative;
+  width: fit-content;
+  padding: 1rem;
+  margin: 1rem auto;
+}
+
+.App h1:before,
+.App h1:after,
+.App h2:before,
+.App h2:after {
+  content: '';
+  position: absolute;
+  width: calc(25vw - 50%);
+  top: 50%;
+  border: var(--color) 2px solid;
+}
+
+.App h2:before,
+.App h2:after {
+  border-width: 1px;
+}
+
+.App h1:before,
+.App h2:before {
+  left: 100%;
+}
+.App h1:after,
+.App h2:after {
+  right: 100%;
+}
+
+.example-selector {
   display: flex;
   margin: auto;
   justify-content: center;
+}
+
+button {
+  border-radius: 0.3rem;
+  border: none;
+  padding: 0.5rem;
+  margin: 0.1rem 0.5rem;
+
+  color: var(--color-button);
+  background-color: var(--color-button-bg);
+  font-family: 'Roboto', sans-serif;
+  font-size: 1rem;
+}
+
+button:hover {
+  background-color: var(--color-button-bg-hover);
+}
+button:disabled {
+  color: gray;
+  background-color: var(--color-button-bg-disabled);
 }
