@@ -1,40 +1,18 @@
-import { useState, useEffect } from 'react';
+import React from 'react';
 
 import { withActionStack } from '../ActionStack/ActionStack';
-import StatelessForm from './StatelessForm';
+import UndoableForm from './UndoableForm';
 
-function HOCSample({
-  state,
-  onAction,
-  onUndo,
-  onRedo,
-  numberOfAvailableUndos,
-  numberOfAvailableRedos,
-}) {
-  const [draftState, setDraftState] = useState(null);
+class HOCSample extends React.Component {
+  render() {
+    return (
+      <div>
+        <h2>useActionStack hook example</h2>
 
-  useEffect(() => {
-    setDraftState(state);
-  }, [state]);
-
-  return (
-    <div>
-      <h2>useActionStack hook example</h2>
-
-      <StatelessForm
-        state={state}
-        onAction={onAction}
-        onUndo={onUndo}
-        onRedo={onRedo}
-        numberOfAvailableUndos={numberOfAvailableUndos}
-        numberOfAvailableRedos={numberOfAvailableRedos}
-        draftState={draftState}
-        onDraftChange={(change) =>
-          setDraftState((prev) => ({ ...prev, ...change }))
-        }
-      />
-    </div>
-  );
+        <UndoableForm {...this.props} />
+      </div>
+    );
+  }
 }
 
 export default withActionStack(HOCSample);

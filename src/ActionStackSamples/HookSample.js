@@ -1,40 +1,14 @@
-import { useState, useEffect } from 'react';
-
 import { useActionStack } from '../ActionStack/ActionStack';
-import StatelessForm from './StatelessForm';
+import UndoableForm from './UndoableForm';
 
 function HookSample({ initialState }) {
-  const {
-    state,
-    onAction,
-    onUndo,
-    onRedo,
-    numberOfAvailableUndos,
-    numberOfAvailableRedos,
-  } = useActionStack(initialState);
-
-  const [draftState, setDraftState] = useState(null);
-
-  useEffect(() => {
-    setDraftState(state);
-  }, [state]);
+  const props = useActionStack(initialState);
 
   return (
     <div>
       <h2>useActionStack hook example</h2>
 
-      <StatelessForm
-        state={state}
-        onAction={onAction}
-        onUndo={onUndo}
-        onRedo={onRedo}
-        numberOfAvailableUndos={numberOfAvailableUndos}
-        numberOfAvailableRedos={numberOfAvailableRedos}
-        draftState={draftState}
-        onDraftChange={(change) =>
-          setDraftState((prev) => ({ ...prev, ...change }))
-        }
-      />
+      <UndoableForm {...props} />
     </div>
   );
 }

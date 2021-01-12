@@ -1,18 +1,23 @@
 import _ from 'lodash';
+import { useState, useEffect } from 'react';
 
 import ActionButton from '../components/ActionButton';
 import Input from '../components/Input';
 
-function StatelessForm({
+function UndoableForm({
   state,
   onAction,
   onUndo,
   onRedo,
   numberOfAvailableUndos,
   numberOfAvailableRedos,
-  draftState,
-  onDraftChange,
 }) {
+  const [draftState, setDraftState] = useState(null);
+
+  useEffect(() => {
+    setDraftState(state);
+  }, [state]);
+
   return (
     <form>
       {draftState &&
@@ -21,7 +26,9 @@ function StatelessForm({
             key={key}
             name={key}
             value={draftState[key]}
-            onChange={(value) => onDraftChange({ [key]: value })}
+            onChange={(value) =>
+              setDraftState((draft) => ({ ...draft, [key]: value }))
+            }
             referenceValue={state[key]}
           />
         ))}
@@ -53,4 +60,4 @@ function StatelessForm({
   );
 }
 
-export default StatelessForm;
+export default UndoableForm;
