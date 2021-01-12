@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 
 import ActionButton from '../components/ActionButton';
 import Input from '../components/Input';
+import './UndoableForm.css';
 
 function UndoableForm({
   state,
@@ -19,7 +20,7 @@ function UndoableForm({
   }, [state]);
 
   return (
-    <form>
+    <form className="undoable-form">
       {draftState &&
         Object.keys(draftState).map((key) => (
           <Input

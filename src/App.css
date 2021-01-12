@@ -3,20 +3,8 @@
   text-align: center;
 }
 
-.button-container {
+.sample-selector {
   display: flex;
   margin: auto;
   justify-content: center;
-}
-
-.button-container button {
-  width: 5rem;
-}
-
-form {
-  margin: auto;
-  width: fit-content;
-  display: flex;
-  flex-direction: column;
-  justify-content: left;
 }

@@ -1,0 +1,17 @@
+.undoable-form {
+  margin: auto;
+  width: fit-content;
+  display: flex;
+  flex-direction: column;
+  justify-content: left;
+}
+
+.button-container {
+  display: flex;
+  margin: auto;
+  justify-content: center;
+}
+
+.button-container button {
+  width: 5rem;
+}

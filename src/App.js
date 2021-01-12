@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import './App.css';
 import HookSample from './ActionStackSamples/HookSample';
@@ -13,12 +13,26 @@ const initialState = {
 };
 
 function App() {
+  const [sample, setSample] = useState('hook');
+
   return (
     <div className="App">
       <h1>ActionStack</h1>
 
-      <HookSample initialState={initialState} />
-      <HOCSample initialState={initialState} />
+      <form class="sample-selector">
+        <button type="button" onClick={() => setSample('hook')}>
+          Hook
+        </button>
+        <button type="button" onClick={() => setSample('hoc')}>
+          HOC
+        </button>
+        <button type="button" onClick={() => setSample('provider')}>
+          Provider
+        </button>
+      </form>
+
+      {sample === 'hook' && <HookSample initialState={initialState} />}
+      {sample === 'hoc' && <HOCSample initialState={initialState} />}
     </div>
   );
 }
