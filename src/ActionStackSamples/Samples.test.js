@@ -30,13 +30,13 @@ function e2eTestFor(SampleUnderTest) {
     beforeEach(() => {
       render(<SampleUnderTest initialState={initialState} />);
 
-      checkboxElem = screen.getByLabelText('a:');
-      textInput = screen.getByLabelText('b:');
-      numberInput = screen.getByLabelText('c:');
+      checkboxElem = screen.getAllByLabelText('a:')[0];
+      textInput = screen.getAllByLabelText('b:')[0];
+      numberInput = screen.getAllByLabelText('c:')[0];
 
-      saveButton = screen.getByText('Save');
-      undoButton = screen.getByText('Undo');
-      redoButton = screen.getByText('Redo');
+      saveButton = screen.getAllByText('Save')[0];
+      undoButton = screen.getAllByText('Undo')[0];
+      redoButton = screen.getAllByText('Redo')[0];
     });
 
     test('initial state is the given one, buttons are disabled', () => {
