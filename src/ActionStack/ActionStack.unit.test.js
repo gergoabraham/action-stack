@@ -193,6 +193,22 @@ describe('ActionStackLogic unit tests', () => {
           sameHistory = Logic.onRedo(-1)(historyWith4Redos);
           expect(sameHistory).toStrictEqual(historyWith4Redos);
         });
+
+        test('onAction clears redo diffs', () => {
+          const historyWithoutRedo = Logic.onAction({
+            a: 'blab',
+            b: -3,
+            c: true,
+          })(historyWith4Redos);
+
+          expect(historyWithoutRedo).toStrictEqual({
+            array: [
+              { a: 'a', b: 13 },
+              { a: 'blab', b: -3, c: true },
+            ],
+            historyIndex: 1,
+          });
+        });
       });
     });
   });
