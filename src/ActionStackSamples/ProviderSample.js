@@ -12,7 +12,7 @@ function ProviderSample({ initialState }) {
 
       <ActionStackProvider initialState={initialState}>
         <ActionStackContext.Consumer>
-          {(props) => <UndoableForm {...props} />}
+          {(props) => <UndoableForm {...props} formId="consumer" />}
         </ActionStackContext.Consumer>
 
         <h3>Same context:</h3>

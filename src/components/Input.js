@@ -1,6 +1,6 @@
 import React from 'react';
 
-function Input({ name, value, referenceValue, onChange }) {
+function Input({ formId, name, value, referenceValue, onChange }) {
   let typeProps, valueSelector;
 
   switch (typeof value) {
@@ -30,7 +30,7 @@ function Input({ name, value, referenceValue, onChange }) {
   return (
     <div>
       <label
-        htmlFor={name}
+        htmlFor={formId + name}
         style={{
           fontWeight: value !== referenceValue ? 'bold' : 'normal',
         }}
@@ -40,7 +40,7 @@ function Input({ name, value, referenceValue, onChange }) {
 
       <input
         {...typeProps}
-        id={name}
+        id={formId + name}
         onChange={(event) => onChange(valueSelector(event))}
       />
     </div>

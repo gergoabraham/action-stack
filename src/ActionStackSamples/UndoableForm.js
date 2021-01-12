@@ -12,6 +12,7 @@ function UndoableForm({
   onRedo,
   numberOfAvailableUndos,
   numberOfAvailableRedos,
+  formId = '',
 }) {
   const [draftState, setDraftState] = useState(null);
 
@@ -24,6 +25,7 @@ function UndoableForm({
       {draftState &&
         Object.keys(draftState).map((key) => (
           <Input
+            formId={formId}
             key={key}
             name={key}
             value={draftState[key]}
