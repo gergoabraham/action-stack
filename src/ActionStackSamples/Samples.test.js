@@ -1,154 +1,168 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import HookSample from './HookSample';
+import HOCSample from './HOCSample';
 
-describe('E2E tests', () => {
-  const initialState = {
-    a: true,
-    b: 'text',
-    c: 13,
-  };
+// eslint-disable-next-line jest/valid-describe
+describe('E2E tests for Hook', e2eTestFor(HookSample));
 
-  let checkboxElem, textInput, numberInput, saveButton, undoButton, redoButton;
+// eslint-disable-next-line jest/valid-describe
+describe('E2E tests for HOC', e2eTestFor(HOCSample));
 
-  beforeEach(() => {
-    render(<HookSample initialState={initialState} />);
+function e2eTestFor(SampleUnderTest) {
+  return () => {
+    const initialState = {
+      a: true,
+      b: 'text',
+      c: 13,
+    };
 
-    checkboxElem = screen.getByLabelText('a:');
-    textInput = screen.getByLabelText('b:');
-    numberInput = screen.getByLabelText('c:');
+    let checkboxElem,
+      textInput,
+      numberInput,
+      saveButton,
+      undoButton,
+      redoButton;
 
-    saveButton = screen.getByText('Save');
-    undoButton = screen.getByText('Undo');
-    redoButton = screen.getByText('Redo');
-  });
+    beforeEach(() => {
+      render(<SampleUnderTest initialState={initialState} />);
 
-  test('initial state is the given one, buttons are disabled', () => {
-    assertState();
-  });
+      checkboxElem = screen.getByLabelText('a:');
+      textInput = screen.getByLabelText('b:');
+      numberInput = screen.getByLabelText('c:');
 
-  test('Save button is enabled when checkbox is changed', async () => {
-    fireEvent.click(checkboxElem);
+      saveButton = screen.getByText('Save');
+      undoButton = screen.getByText('Undo');
+      redoButton = screen.getByText('Redo');
+    });
 
-    assertState({ checkbox: false, save: true });
-  });
+    test('initial state is the given one, buttons are disabled', () => {
+      assertState();
+    });
 
-  test('Save button is enabled when number is changed', async () => {
-    fireEvent.change(numberInput, { target: { value: 14 } });
+    test('Save button is enabled when checkbox is changed', async () => {
+      fireEvent.click(checkboxElem);
 
-    assertState({ number: 14, save: true });
-  });
+      assertState({ checkbox: false, save: true });
+    });
 
-  test('Save button is enabled when text is changed', async () => {
-    fireEvent.change(textInput, { target: { value: 'another text' } });
+    test('Save button is enabled when number is changed', async () => {
+      fireEvent.change(numberInput, { target: { value: 14 } });
 
-    assertState({ text: 'another text', save: true });
-  });
+      assertState({ number: 14, save: true });
+    });
 
-  test('Undo button is enabled when changes are saved', async () => {
-    fireEvent.change(textInput, { target: { value: 'another text' } });
+    test('Save button is enabled when text is changed', async () => {
+      fireEvent.change(textInput, { target: { value: 'another text' } });
 
-    fireEvent.click(saveButton);
+      assertState({ text: 'another text', save: true });
+    });
 
-    assertState({ text: 'another text', undo: 1 });
-  });
+    test('Undo button is enabled when changes are saved', async () => {
+      fireEvent.change(textInput, { target: { value: 'another text' } });
 
-  test('Undo button has a dropdown when there are multiple undo buttons', async () => {
-    const actualState = save3Actions();
+      fireEvent.click(saveButton);
 
-    assertState({ ...actualState, undo: 3 });
-  });
+      assertState({ text: 'another text', undo: 1 });
+    });
 
-  test('Undo works, enables redo button', async () => {
-    const actualState = save3Actions();
+    test('Undo button has a dropdown when there are multiple undo buttons', async () => {
+      const actualState = save3Actions();
 
-    fireEvent.click(undoButton);
+      assertState({ ...actualState, undo: 3 });
+    });
 
-    assertState({ ...actualState, checkbox: false, undo: 2, redo: 1 });
-  });
+    test('Undo works, enables redo button', async () => {
+      const actualState = save3Actions();
 
-  test('Multiple undo works, redo has a dropdown', async () => {
-    save3Actions();
+      fireEvent.click(undoButton);
 
-    fireEvent.mouseEnter(undoButton);
-    fireEvent.click(screen.queryByText('3 steps'));
+      assertState({ ...actualState, checkbox: false, undo: 2, redo: 1 });
+    });
 
-    assertState({ redo: 3 });
-  });
+    test('Multiple undo works, redo has a dropdown', async () => {
+      save3Actions();
 
-  test('Multiple redo works', async () => {
-    const latestState = save3Actions();
+      fireEvent.mouseEnter(undoButton);
+      fireEvent.click(screen.queryByText('3 steps'));
 
-    fireEvent.mouseEnter(undoButton);
-    fireEvent.click(screen.queryByText('3 steps'));
+      assertState({ redo: 3 });
+    });
 
-    fireEvent.mouseEnter(redoButton);
-    fireEvent.click(screen.getByText('3 steps'));
+    test('Multiple redo works', async () => {
+      const latestState = save3Actions();
 
-    assertState({ ...latestState, undo: 3 });
-  });
+      fireEvent.mouseEnter(undoButton);
+      fireEvent.click(screen.queryByText('3 steps'));
 
-  test('Saving a new state clears redo', async () => {
-    save3Actions();
+      fireEvent.mouseEnter(redoButton);
+      fireEvent.click(screen.getByText('3 steps'));
 
-    fireEvent.mouseEnter(undoButton);
-    fireEvent.click(screen.queryByText('3 steps'));
+      assertState({ ...latestState, undo: 3 });
+    });
 
-    fireEvent.click(checkboxElem);
-    fireEvent.click(saveButton);
+    test('Saving a new state clears redo', async () => {
+      save3Actions();
 
-    assertState({ checkbox: false, undo: 1 });
-  });
+      fireEvent.mouseEnter(undoButton);
+      fireEvent.click(screen.queryByText('3 steps'));
 
-  function assertState({
-    checkbox = initialState.a,
-    text = initialState.b,
-    number = initialState.c,
-    save = false,
-    undo = 0,
-    redo = 0,
-  } = {}) {
-    checkbox
-      ? expect(checkboxElem).toBeChecked()
-      : expect(checkboxElem).not.toBeChecked();
-    expect(textInput).toHaveValue(text);
-    expect(numberInput).toHaveValue(number);
+      fireEvent.click(checkboxElem);
+      fireEvent.click(saveButton);
 
-    assertButton(save, saveButton);
-    assertActionButton(undo, undoButton);
-    assertActionButton(redo, redoButton);
-  }
+      assertState({ checkbox: false, undo: 1 });
+    });
 
-  function assertButton(enabled, button) {
-    enabled
-      ? expect(button).not.toHaveAttribute('disabled')
-      : expect(button).toHaveAttribute('disabled');
-  }
+    function assertState({
+      checkbox = initialState.a,
+      text = initialState.b,
+      number = initialState.c,
+      save = false,
+      undo = 0,
+      redo = 0,
+    } = {}) {
+      checkbox
+        ? expect(checkboxElem).toBeChecked()
+        : expect(checkboxElem).not.toBeChecked();
+      expect(textInput).toHaveValue(text);
+      expect(numberInput).toHaveValue(number);
 
-  function assertActionButton(num, button) {
-    assertButton(num, button);
-    assertActionButtonDropdown(num, button);
-  }
-
-  function assertActionButtonDropdown(num, button) {
-    if (num > 1) {
-      expect(screen.queryByText(`${num} steps`)).not.toBeInTheDocument();
-      expect(screen.queryByText(`${num + 1} steps`)).not.toBeInTheDocument();
-
-      fireEvent.mouseEnter(button);
-
-      expect(screen.queryByText(`${num} steps`)).toBeInTheDocument();
-      expect(screen.queryByText(`${num + 1} steps`)).not.toBeInTheDocument();
+      assertButton(save, saveButton);
+      assertActionButton(undo, undoButton);
+      assertActionButton(redo, redoButton);
     }
-  }
 
-  function save3Actions() {
-    fireEvent.change(textInput, { target: { value: 'another text' } });
-    fireEvent.click(saveButton);
-    fireEvent.click(checkboxElem);
-    fireEvent.click(saveButton);
-    fireEvent.click(checkboxElem);
-    fireEvent.click(saveButton);
+    function assertButton(enabled, button) {
+      enabled
+        ? expect(button).not.toHaveAttribute('disabled')
+        : expect(button).toHaveAttribute('disabled');
+    }
 
-    return { text: 'another text' };
-  }
-});
+    function assertActionButton(num, button) {
+      assertButton(num, button);
+      assertActionButtonDropdown(num, button);
+    }
+
+    function assertActionButtonDropdown(num, button) {
+      if (num > 1) {
+        expect(screen.queryByText(`${num} steps`)).not.toBeInTheDocument();
+        expect(screen.queryByText(`${num + 1} steps`)).not.toBeInTheDocument();
+
+        fireEvent.mouseEnter(button);
+
+        expect(screen.queryByText(`${num} steps`)).toBeInTheDocument();
+        expect(screen.queryByText(`${num + 1} steps`)).not.toBeInTheDocument();
+      }
+    }
+
+    function save3Actions() {
+      fireEvent.change(textInput, { target: { value: 'another text' } });
+      fireEvent.click(saveButton);
+      fireEvent.click(checkboxElem);
+      fireEvent.click(saveButton);
+      fireEvent.click(checkboxElem);
+      fireEvent.click(saveButton);
+
+      return { text: 'another text' };
+    }
+  };
+}

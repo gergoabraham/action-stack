@@ -1,6 +1,7 @@
 import _ from 'lodash/array';
 import { useState } from 'react';
 
+// Hook
 export function useActionStack(initialState) {
   const [history, setHistory] = useState(
     Logic.createInitialHistory(initialState)
@@ -16,6 +17,17 @@ export function useActionStack(initialState) {
   };
 }
 
+// HOC
+export const withActionStack = (WrappedComponent) => ({
+  initialState,
+  ...props
+}) => {
+  const actionStackHookProps = useActionStack(initialState);
+
+  return <WrappedComponent {...props} {...actionStackHookProps} />;
+};
+
+// Business logic, exported for tests
 export class Logic {
   static createInitialHistory = (initialState) => ({
     array: [initialState],
@@ -32,9 +44,9 @@ export class Logic {
   static onAction = (newState) => (history) => {
     const previousState = history.array[history.historyIndex];
 
-    Logic.assertNewState(newState, previousState);
+    Logic.#assertNewState(newState, previousState);
 
-    const diffForUndo = Logic.getDifferences(previousState, newState);
+    const diffForUndo = Logic.#getDifferences(previousState, newState);
 
     if (Object.keys(diffForUndo).length > 0) {
       return {
@@ -60,7 +72,7 @@ export class Logic {
           ...currentState,
           ...historyDraft.array[historyDraft.historyIndex - 1],
         };
-        const diffForRedo = Logic.getDifferences(currentState, previousState);
+        const diffForRedo = Logic.#getDifferences(currentState, previousState);
 
         historyDraft = {
           array: [
@@ -87,7 +99,7 @@ export class Logic {
           ...historyDraft.array[historyDraft.historyIndex],
           ...historyDraft.array[historyDraft.historyIndex + 1],
         };
-        const diffForUndo = Logic.getDifferences(
+        const diffForUndo = Logic.#getDifferences(
           historyDraft.array[historyDraft.historyIndex],
           nextState
         );
@@ -109,7 +121,7 @@ export class Logic {
     }
   };
 
-  static getDifferences = (object, referenceObject) => {
+  static #getDifferences = (object, referenceObject) => {
     const differences = {};
 
     for (const key in referenceObject) {
@@ -122,7 +134,7 @@ export class Logic {
     return differences;
   };
 
-  static assertNewState = (newState, previousState) => {
+  static #assertNewState = (newState, previousState) => {
     const newKeys = Object.keys(newState);
     const previousKeys = Object.keys(previousState);
 
