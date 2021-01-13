@@ -1,10 +1,10 @@
 import { useActionStackContext } from '../ActionStack/ActionStack';
 import UndoableForm from './UndoableForm';
 
-function ProviderSampleConsumer() {
-  const props = useActionStackContext();
+function ProviderSampleConsumer(props) {
+  const actionStackProps = useActionStackContext();
 
-  return <UndoableForm {...props} />;
+  return <UndoableForm {...props} {...actionStackProps} />;
 }
 
 export default ProviderSampleConsumer;

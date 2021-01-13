@@ -6,10 +6,14 @@
   --color-button-bg: #ffc52c;
   --color-button-bg-hover: #fb0c06;
   --color-button-bg-disabled: #030d4f;
+
+  --transition: all 200ms ease;
+  --transition-slow: all 500ms ease;
 }
 
 body {
   background-color: var(--color-background);
+  overflow-y: scroll;
 }
 
 .App {
@@ -87,4 +91,36 @@ button:hover {
 button:disabled {
   color: gray;
   background-color: var(--color-button-bg-disabled);
+}
+
+.sample-container {
+  position: relative;
+}
+
+.sample {
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+
+.fade-in-enter {
+  opacity: 0;
+}
+
+.fade-in-enter-active {
+  opacity: 1;
+  transition: var(--transition-slow);
+}
+
+.fade-in-exit {
+  opacity: 1;
+}
+
+.fade-in-exit-active {
+  opacity: 0;
+  transition: var(--transition-slow);
+}
+
+.fade-in-exit-done {
+  display: none;
 }

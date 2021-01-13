@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import HookSample from './HookSample';
 import HOCSample from './HOCSample';
 import ProviderSample from './ProviderSample';
@@ -39,26 +39,26 @@ function e2eTestFor(SampleUnderTest) {
       redoButton = screen.getAllByText('Redo')[0];
     });
 
-    test('initial state is the given one, buttons are disabled', () => {
-      assertState();
+    test('initial state is the given one, buttons are disabled', async () => {
+      await assertState();
     });
 
     test('Save button is enabled when checkbox is changed', async () => {
       fireEvent.click(checkboxElem);
 
-      assertState({ checkbox: false, save: true });
+      await assertState({ checkbox: false, save: true });
     });
 
     test('Save button is enabled when number is changed', async () => {
       fireEvent.change(numberInput, { target: { value: 14 } });
 
-      assertState({ number: 14, save: true });
+      await assertState({ number: 14, save: true });
     });
 
     test('Save button is enabled when text is changed', async () => {
       fireEvent.change(textInput, { target: { value: 'another text' } });
 
-      assertState({ text: 'another text', save: true });
+      await assertState({ text: 'another text', save: true });
     });
 
     test('Undo button is enabled when changes are saved', async () => {
@@ -66,13 +66,13 @@ function e2eTestFor(SampleUnderTest) {
 
       fireEvent.click(saveButton);
 
-      assertState({ text: 'another text', undo: 1 });
+      await assertState({ text: 'another text', undo: 1 });
     });
 
     test('Undo button has a dropdown when there are multiple undo buttons', async () => {
       const actualState = save3Actions();
 
-      assertState({ ...actualState, undo: 3 });
+      await assertState({ ...actualState, undo: 3 });
     });
 
     test('Undo works, enables redo button', async () => {
@@ -80,7 +80,7 @@ function e2eTestFor(SampleUnderTest) {
 
       fireEvent.click(undoButton);
 
-      assertState({ ...actualState, checkbox: false, undo: 2, redo: 1 });
+      await assertState({ ...actualState, checkbox: false, undo: 2, redo: 1 });
     });
 
     test('Multiple undo works, redo has a dropdown', async () => {
@@ -89,7 +89,7 @@ function e2eTestFor(SampleUnderTest) {
       fireEvent.mouseEnter(undoButton);
       fireEvent.click(screen.queryByText('3 steps'));
 
-      assertState({ redo: 3 });
+      await assertState({ redo: 3 });
     });
 
     test('Multiple redo works', async () => {
@@ -101,7 +101,7 @@ function e2eTestFor(SampleUnderTest) {
       fireEvent.mouseEnter(redoButton);
       fireEvent.click(screen.getByText('3 steps'));
 
-      assertState({ ...latestState, undo: 3 });
+      await assertState({ ...latestState, undo: 3 });
     });
 
     test('Saving a new state clears redo', async () => {
@@ -113,10 +113,10 @@ function e2eTestFor(SampleUnderTest) {
       fireEvent.click(checkboxElem);
       fireEvent.click(saveButton);
 
-      assertState({ checkbox: false, undo: 1 });
+      await assertState({ checkbox: false, undo: 1 });
     });
 
-    function assertState({
+    async function assertState({
       checkbox = initialState.a,
       text = initialState.b,
       number = initialState.c,
@@ -131,8 +131,8 @@ function e2eTestFor(SampleUnderTest) {
       expect(numberInput).toHaveValue(number);
 
       assertButton(save, saveButton);
-      assertActionButton(undo, undoButton);
-      assertActionButton(redo, redoButton);
+      await assertActionButton(undo, undoButton);
+      await assertActionButton(redo, redoButton);
     }
 
     function assertButton(enabled, button) {
@@ -141,20 +141,29 @@ function e2eTestFor(SampleUnderTest) {
         : expect(button).toHaveAttribute('disabled');
     }
 
-    function assertActionButton(num, button) {
+    async function assertActionButton(num, button) {
       assertButton(num, button);
-      assertActionButtonDropdown(num, button);
+      await assertActionButtonDropdown(num, button);
     }
 
-    function assertActionButtonDropdown(num, button) {
+    async function assertActionButtonDropdown(num, button) {
       if (num > 1) {
-        expect(screen.queryByText(`${num} steps`)).not.toBeInTheDocument();
-        expect(screen.queryByText(`${num + 1} steps`)).not.toBeInTheDocument();
+        // we need to wait until CSS transitions are done
+        await waitFor(() => {
+          expect(screen.queryByText(`${num} steps`)).not.toBeInTheDocument();
+          expect(
+            screen.queryByText(`${num + 1} steps`)
+          ).not.toBeInTheDocument();
+        });
 
         fireEvent.mouseEnter(button);
 
-        expect(screen.queryByText(`${num} steps`)).toBeInTheDocument();
-        expect(screen.queryByText(`${num + 1} steps`)).not.toBeInTheDocument();
+        await waitFor(() => {
+          expect(screen.queryByText(`${num} steps`)).toBeInTheDocument();
+          expect(
+            screen.queryByText(`${num + 1} steps`)
+          ).not.toBeInTheDocument();
+        });
       }
     }
 

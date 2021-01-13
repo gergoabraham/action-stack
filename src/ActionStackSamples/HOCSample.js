@@ -6,10 +6,10 @@ import UndoableForm from './UndoableForm';
 class HOCSample extends React.Component {
   render() {
     return (
-      <div>
+      <div className={this.props.className}>
         <h2>ActionStack HOC example</h2>
 
-        <UndoableForm {...this.props} />
+        <UndoableForm formId="hoc" {...this.props} />
       </div>
     );
   }

@@ -30,7 +30,11 @@ function Input({ formId, name, value, referenceValue, onChange }) {
   }
 
   return (
-    <div className={value !== referenceValue ? 'diff-highlight' : ''}>
+    <div
+      className={
+        'input-field ' + (value !== referenceValue ? 'diff-highlight' : '')
+      }
+    >
       <label htmlFor={formId + name}>{name}:</label>
 
       <input

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { CSSTransition } from 'react-transition-group';
 
 import './App.css';
 import HookSample from './ActionStackSamples/HookSample';
@@ -16,6 +17,12 @@ const initialState = {
 function App() {
   const [sample, setSample] = useState('hook');
 
+  const transitionProps = {
+    timeout: 550,
+    classNames: 'fade-in',
+    mountOnEnter: true,
+  };
+
   return (
     <div className="App">
       <h1>ActionStack</h1>
@@ -32,9 +39,19 @@ function App() {
         </button>
       </form>
 
-      {sample === 'hook' && <HookSample initialState={initialState} />}
-      {sample === 'hoc' && <HOCSample initialState={initialState} />}
-      {sample === 'provider' && <ProviderSample initialState={initialState} />}
+      <div className="sample-container">
+        <CSSTransition in={sample === 'hook'} {...transitionProps}>
+          <HookSample className="sample" initialState={initialState} />
+        </CSSTransition>
+
+        <CSSTransition in={sample === 'hoc'} {...transitionProps}>
+          <HOCSample className="sample" initialState={initialState} />
+        </CSSTransition>
+
+        <CSSTransition in={sample === 'provider'} {...transitionProps}>
+          <ProviderSample className="sample" initialState={initialState} />
+        </CSSTransition>
+      </div>
     </div>
   );
 }

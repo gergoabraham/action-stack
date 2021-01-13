@@ -1,3 +1,7 @@
+.input-field {
+  transition: var(--transition);
+}
+
 .diff-highlight {
   background-color: var(--color-button-bg);
   color: var(--color-button-bg-disabled);

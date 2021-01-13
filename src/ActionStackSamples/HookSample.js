@@ -1,14 +1,14 @@
 import { useActionStack } from '../ActionStack/ActionStack';
 import UndoableForm from './UndoableForm';
 
-function HookSample({ initialState }) {
+function HookSample({ initialState, className }) {
   const props = useActionStack(initialState);
 
   return (
-    <div>
+    <div className={className}>
       <h2>useActionStack hook example</h2>
 
-      <UndoableForm {...props} />
+      <UndoableForm formId="hook" {...props} />
     </div>
   );
 }
