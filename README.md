@@ -1,70 +1,127 @@
-# Getting Started with Create React App
+# ActionStack
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+The goal of this exercise was to implement a helper that is able to track changes (actions) in a space-efficient way, and undo/redo them.
 
-## Available Scripts
+[Click here to see it in action!](https://gergooo.github.io/action-stack/)
 
-In the project directory, you can run:
+## Functionality
 
-### `npm start`
+### Interface
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+`ActionStack` provides a lot of props to its users. First, there is `state`, that can be initialized with an object, that can only contain primitive `numbers`, `strings` and `booleans`. This `state` can be used as the client component's inner state.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+`onAction(newState)` is a callback, that should be called when the client wants to update its state. The input value must have the same keys as the current state.
 
-### `npm test`
+`onUndo(steps?)` and `onRedo(steps?)` are used to undo or redo the last actions. `steps` is an optional parameter to indicate how many actions we want to undo/redo. On default it is `1`.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+`numberOfAvailableUndos` and `numberOfAvailableRedos` give the number of available undo/redo operations, they are always greater than or equal to zero.
 
-### `npm run build`
+### Usage
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+`ActionStack` can be used in 3 ways. You can see the examples in the `ActionStackSamples` folder.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+#### Hook
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+`useActionStack` is a hook for function components:
 
-### `npm run eject`
+```javascript
+import { useActionStack } from '../ActionStack/ActionStack';
+...
+const props = useActionStack(initialState);
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+Here, `props` will contain `state`, `onAction` and the other props.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+#### Higher-order component
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+`withActionStack` is a higher-order component for both function and class components:
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+```javascript
+import { withActionStack } from '../ActionStack/ActionStack';
+...
+export default withActionStack(MyComponent);
+```
 
-## Learn More
+`MyComponent` will receive all the `props`.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+#### Provider
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+`ActionStackProvider` can be used either in pair with its `ActionStackContext` or with the `useActionStackContext` hook.
 
-### Code Splitting
+`ParentComponent.js`:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+```javascript
+import { ActionStackProvider } from '../ActionStack/ActionStack';
+...
+<ActionStackProvider initialState={initialState}>
+  { /* consumer components come here */ }
+</ActionStackProvider>
+```
 
-### Analyzing the Bundle Size
+`Consumer1.js`:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+```javascript
+import { ActionStackContext } from '../ActionStack/ActionStack';
+...
+<ActionStackContext.Consumer>
+  {(props) => <MyComponent {...props}/>}
+</ActionStackContext.Consumer>
+```
 
-### Making a Progressive Web App
+`Consumer2.js`:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+```javascript
+import { useActionStackContext } from '../ActionStack/ActionStack';
+...
+const props = useActionStackContext();
+```
 
-### Advanced Configuration
+## Implementation
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### Logic
 
-### Deployment
+`ActionStack`'s `Logic` class contains all the business logic as pure functions. All of them receives one or more parameters that won't be mutated, and returns with the new history (or other desired return values).
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+The `useActionStack` hook wraps this `Logic` and combines it with the `useState` hook. The higher-order component and the Provider wraps the `useActionStack` hook itself.
 
-### `npm run build` fails to minify
+#### Space-efficiency
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+The history consists of an `array` and a `historyIndex`. `historyIndex` points to the current state in the `array`, which describes the full state including all of its properties.
+
+Before and after the current state are the undo and redo differences, if there are any. There, only the differences are stored compared to the adjacent state.
+
+```javascript
+{
+  array: [
+    {prevA                    }, // here are 3 undo diffs
+    {       prevB, prevC      },
+    {prevA                    },
+    {    a,     b,     c,    d}, // this is the current state
+    {       nextB             },
+    {                    nextD}, // and these were 2 redo diffs
+  ],
+  historyIndex: 3;
+}
+```
+
+As mentioned, the differences are calculated compared to the adjacent state. In other words, in the above example to go back from the 4th (current) state to the 2nd state, all of `prevA` from the 3rd state diff, and `prevB` and `prevC` from the 2nd state diff should be applied, similarly to the _incremental backup strategy_. Afterwards the new state and the new diffs are stored in the array.
+
+### Implementation, tests
+
+As you can see from the commit log, I've implemented this starting with the hook version, adding features one-by-one, supporting with a UI and manual testing. After all features were added, I've optimized the history to store only the diffs, unfortunately still without automated tests.
+
+Afterwards I've extracted the business logic from the hook, in order to a) make it simple to write unit tests, b) I had it in mind that I will use the same functions in the HOC and Provider versions. Regarding b), I was wrong, because the HOC and the Provider uses the hook itself. Regarding a), it would have been nicer to first write the high-level tests that support this kind of refactoring.
+
+So there was no stopping from here, unit tests for checking the inner state of `ActionStack`, and end-to-end tests for checking its operation on the UI were added!
+
+Getting confident with tests, I was able to extract the UI functionality from `App` to `HookSample` and started to refactor the code in a way to make it easy to add the other versions and their examples.
+
+I've modified the end-to-end test, so it checks all the examples one-by-one instead of the `App`. With these new integration tests, I could be sure that when implementing HOC and Provider, they work exactly the same as the hook:
+
+```javascript
+describe('Integration tests for Hook', e2eTestFor(HookSample));
+describe('Integration tests for HOC', e2eTestFor(HOCSample));
+describe('Integration tests for Provider', e2eTestFor(ProviderSample));
+```
+
+Finally, I applied some last refactors, styles and transitions, and here we are.
